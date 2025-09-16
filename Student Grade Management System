@@ -1,0 +1,239 @@
+
+
+package studentmanagement;
+
+import java.util.Scanner;
+
+public class StudentGradeManagement {
+    
+    static int maxStudents = 50;
+    static Student[] students = new Student[maxStudents];
+    static int studentCount = 0;
+    static Scanner s = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        while (true) {
+            showMenu();
+            int choice = s.nextInt();
+
+            switch (choice) {
+                case 1 -> addStudent();
+                case 2 -> updateMarks();
+                case 3 -> removeStudent();
+                case 4 -> viewAllStudents();
+                case 5 -> searchStudent();
+                case 6 -> highestScorer();
+                case 7 -> classAverage();
+                case 8 -> {
+                    exitProgram();
+                    return;
+                }
+                default -> System.out.println("Invalid choice! Try again.");
+            }
+        }
+    }
+
+   
+    public static void showMenu() {
+        System.out.println("\n--- Student Grade Management System ---");
+        System.out.println("1. Add Student");
+        System.out.println("2. Update Marks");
+        System.out.println("3. Remove Student");
+        System.out.println("4. View All Students");
+        System.out.println("5. Search Student");
+        System.out.println("6. Highest Scorer");
+        System.out.println("7. Class Average");
+        System.out.println("8. Exit");
+        System.out.print("Choose an option: ");
+    }
+
+    
+    public static void addStudent() {
+        if (studentCount >= maxStudents) {
+            System.out.println("Limit reached! Cannot add more students.");
+            return;
+        }
+
+        System.out.print("Enter Roll No: ");
+        int roll = s.nextInt();
+
+        
+        for (int i = 0; i < studentCount; i++) {
+            if (students[i].getRollNumber() == roll) {
+                System.out.println("Roll number already exists!");
+                return;
+            }
+        }
+
+        s.nextLine(); 
+        System.out.print("Enter Name: ");
+        String name = s.nextLine();
+
+        int[] marks = new int[3];
+        for (int j = 0; j < 3; j++) {
+            while (true) {
+                System.out.print("Enter Marks in Subject " + (j + 1) + ": ");
+                int m = s.nextInt();
+                if (m >= 0 && m <= 100) {
+                    marks[j] = m;
+                    break;
+                } else {
+                    System.out.println("Marks must be 0–100!");
+                }
+            }
+        }
+
+        students[studentCount] = new Student(roll, name, marks);
+        studentCount++;
+        System.out.println("Student added successfully!");
+    }
+
+    public static void updateMarks() {
+        System.out.print("Enter Roll No: ");
+        int roll = s.nextInt();
+        for (int i = 0; i < studentCount; i++) {
+            if (students[i].getRollNumber() == roll) {
+                int[] newMarks = new int[3];
+                for (int j = 0; j < 3; j++) {
+                    while (true) {
+                        System.out.print("Enter new Marks in Subject " + (j + 1) + ": ");
+                        int m = s.nextInt();
+                        if (m >= 0 && m <= 100) {
+                            newMarks[j] = m;
+                            break;
+                        } else {
+                            System.out.println("Marks must be 0–100!");
+                        }
+                    }
+                }
+                students[i].setMarks(newMarks);
+                System.out.println("Marks updated successfully!");
+                return;
+            }
+        }
+        System.out.println("Roll number not found!");
+    }
+
+    public static void removeStudent() {
+        System.out.print("Enter Roll No: ");
+        int roll = s.nextInt();
+        for (int i = 0; i < studentCount; i++) {
+            if (students[i].getRollNumber() == roll) {
+                for (int j = i; j < studentCount - 1; j++) {
+                    students[j] = students[j + 1];
+                }
+                studentCount--;
+                System.out.println("Student removed successfully!");
+                return;
+            }
+        }
+        System.out.println("Roll number not found!");
+    }
+
+    public static void viewAllStudents() {
+    if (studentCount == 0) {
+        System.out.println("No students available.");
+        return;
+    }
+
+    System.out.println("\n--- Student List ---");
+    for (int i = 0; i < studentCount; i++) {
+        Student S = students[i];
+        int[] m = S.getMarks();
+
+        System.out.println("-----------------------------");
+        System.out.println("Roll No : " + S.getRollNumber());
+        System.out.println("Name    : " + S.getName());
+        System.out.println("Marks   : ");
+        System.out.println("Subject 1: " + m[0]);
+        System.out.println("Subject 2: " + m[1]);
+        System.out.println("Subject 3: " + m[2]);
+        System.out.println("Total   : " + S.getTotal());
+        System.out.println("Average : " + S.getAverage());
+    }
+    System.out.println("-----------------------------");
+}
+
+    public static void searchStudent() {
+        System.out.print("Enter Roll No: ");
+        int roll = s.nextInt();
+        for (int i = 0; i < studentCount; i++) {
+            if (students[i].getRollNumber() == roll) {
+                int[] m = students[i].getMarks();
+                System.out.println("Roll: " + students[i].getRollNumber());
+                System.out.println("Name: " + students[i].getName());
+                System.out.println("Marks: " + m[0] + ", " + m[1] + ", " + m[2]);
+                System.out.println("Total: " + students[i].getTotal());
+                System.out.println("Average: " + students[i].getAverage());
+                return;
+            }
+        }
+        System.out.println("Roll number not found!");
+    }
+
+    public static void highestScorer() {
+        if (studentCount == 0) {
+            System.out.println("No students available.");
+            return;
+        }
+        int topIndex = 0;
+        int topTotal = students[0].getTotal();
+        for (int i = 1; i < studentCount; i++) {
+            if (students[i].getTotal() > topTotal) {
+                topTotal = students[i].getTotal();
+                topIndex = i;
+            }
+        }
+        System.out.println("Highest Scorer: " + students[topIndex].getName() +
+                " (Roll: " + students[topIndex].getRollNumber() + ")");
+        System.out.println("Total: " + topTotal + ", Average: " + students[topIndex].getAverage());
+    }
+
+    public static void classAverage() {
+        if (studentCount == 0) {
+            System.out.println("No students available.");
+            return;
+        }
+        int sum = 0;
+        int subjects = studentCount * 3;
+        for (int i = 0; i < studentCount; i++) {
+            sum += students[i].getTotal();
+        }
+        double classAvg = sum / (double) subjects;
+        System.out.println("Class Average: " + classAvg);
+    }
+
+    public static void exitProgram() {
+        System.out.println("Exiting Program...");
+        System.out.println("Total Students: " + studentCount);
+        if (studentCount > 0) {
+            int sum = 0;
+            int subjects = studentCount * 3;
+            for (int i = 0; i < studentCount; i++) {
+                sum += students[i].getTotal();
+            }
+            double classAvg = sum / (double) subjects;
+            System.out.println("Class Average: " + classAvg);
+        }
+    }
+}
+
+
+class Student {
+    private int rollNumber;
+    private String name;
+    private int[] marks = new int[3];
+
+    public Student(int rollNumber, String name, int[] marks) {
+        this.rollNumber = rollNumber;
+        this.name = name;
+        this.marks = marks;
+    }
+
+    public int getRollNumber() { return rollNumber; }
+    public String getName() { return name; }
+    public int[] getMarks() { return marks; }
+    public void setMarks(int[] marks) { this.marks = marks; }
+    public int getTotal() { return marks[0] + marks[1] + marks[2]; }
+    public double getAverage() { return getTotal() / 3.0; }
+}
